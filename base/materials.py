@@ -41,6 +41,7 @@ class Material:
                 (1.0 - self.opacity) * self.diffuse[1],
                 (1.0 - self.opacity) * self.diffuse[2]
             )
+            print(self.diffuse, transmission)
             bsdf.add_transmission(self.diffuse, transmission)
 
         # Add dielectric component if the material has a different IOR
