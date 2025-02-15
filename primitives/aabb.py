@@ -131,22 +131,6 @@ def union_p(b1, p1):
     return b2
 
 
-# @ti.func
-# def intersect_bounds(aabb, ray, inv_dir):
-#     t1 = (aabb.min_point - ray.origin) * inv_dir
-#     t2 = (aabb.max_point - ray.origin) * inv_dir
-#
-#     tmin = ti.min(t1, t2)
-#     tmax = ti.max(t1, t2)
-#
-#     tmin_final = ti.max(tmin[0], ti.max(tmin[1], tmin[2]))
-#     tmax_final = ti.min(tmax[0], ti.min(tmax[1], tmax[2]))
-#
-#     epsilon = 1e-6
-#     intersected = (tmax_final + epsilon > tmin_final) and (tmin_final < ray.tmax) and (tmax_final > ray.tmin)
-#     return intersected
-
-
 @ti.func
 def intersect_bounds(aabb, ray, inv_dir):
     result = 0
