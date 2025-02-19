@@ -228,6 +228,8 @@ def intersect_bvh(ray, primitives, nodes, t_min=0.0, t_max=INF):
                     prim_index = node.primitives_offset + i
                     hit, t = primitives[prim_index].intersect(ray.origin, ray.direction, tMax)
                     if hit and tMin < t < tMax:
+                        # if primitives[prim_index].is_light:
+                        #     print("intersected!!")
                         tMax = t
                         intersection.set_intersection(ray, primitives[prim_index], t)
                 if to_visit_offset == 0:
