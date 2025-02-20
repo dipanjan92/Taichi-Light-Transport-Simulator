@@ -1,0 +1,92 @@
+# PBRT Converted Scene from OBJ/MTL
+Integrator "path"
+    "integer maxdepth" [ 65 ]
+#Transform [ 1 -0 -0 -0 -0 1 -0 -0 -0 -0 -1 -0 -0 -1 6.8 1  ]
+Transform [ 1 0 0 0  0 1 0 0  0 0 1 0  0 -1 6.8 1 ]
+
+Sampler "sobol"
+    "integer pixelsamples" [ 64 ]
+PixelFilter "triangle"
+    "float xradius" [ 1 ]
+    "float yradius" [ 1 ]
+Film "rgb"
+    "string filename" [ "converted_scene.png" ]
+    "integer yresolution" [ 1024 ]
+    "integer xresolution" [ 1024 ]
+Camera "perspective"
+    "float fov" [ 19.5 ]
+
+WorldBegin
+
+# Define Materials
+MakeNamedMaterial "backWall"
+    "string type" [ "diffuse" ]
+    "rgb reflectance" [ 0.885809 0.698859 0.666422 ]
+
+MakeNamedMaterial "ceiling"
+    "string type" [ "diffuse" ]
+    "rgb reflectance" [ 0.885809 0.698859 0.666422 ]
+
+MakeNamedMaterial "floor"
+    "string type" [ "diffuse" ]
+    "rgb reflectance" [ 0.885809 0.698859 0.666422 ]
+
+MakeNamedMaterial "leftWall"
+    "string type" [ "diffuse" ]
+    "rgb reflectance" [ 0.105421 0.37798 0.076425 ]
+
+MakeNamedMaterial "rightWall"
+    "string type" [ "diffuse" ]
+    "rgb reflectance" [ 0.570068 0.0430135 0.0443706 ]
+
+MakeNamedMaterial "light"
+    "string type" [ "diffuse" ]
+    "rgb reflectance" [ 0 0 0 ]
+
+# Floor Geometry
+NamedMaterial "floor"
+Shape "trianglemesh"
+    "point3 P" [ -1.010000 0.000000 0.990000  1.000000 0.000000 0.990000  1.000000 -0.000000 -1.040000  -0.990000 -0.000000 -1.040000 ]
+    "normal N" [ 0 1 0  0 1 0  0 1 0  0 1 0 ]
+    "integer indices" [ 0 1 2 0 2 3 ]
+
+# Ceiling Geometry
+NamedMaterial "ceiling"
+Shape "trianglemesh"
+    "point3 P" [ -1.020000 1.990000 0.990000 -1.020000 1.990000 -1.040000 1.000000 1.990000 -1.040000 1.000000 1.990000 0.990000 ]
+    "normal N" [ 0 -1 0  0 -1 0  0 -1 0  0 -1 0 ]
+    "integer indices" [ 0 1 2 0 2 3 ]
+
+# Back Wall Geometry
+NamedMaterial "backWall"
+Shape "trianglemesh"
+    "point3 P" [ -0.990000 -0.000000 -1.040000 1.000000 -0.000000 -1.040000 1.000000 1.990000 -1.040000 -1.020000 1.990000 -1.040000 ]
+    "normal N" [ 0 0 1  0 0 1  0 0 1  0 0 1 ]
+    "integer indices" [ 0 1 2 0 2 3 ]
+
+# Right Wall Geometry
+NamedMaterial "rightWall"
+Shape "trianglemesh"
+    "point3 P" [ 1.000000 -0.000000 -1.040000 1.000000 0.000000 0.990000 1.000000 1.990000 0.990000 1.000000 1.990000 -1.040000 ]
+    "normal N" [ -1 0 0  -1 0 0  -1 0 0  -1 0 0 ]
+    "integer indices" [ 0 1 2 0 2 3 ]
+
+# Left Wall Geometry
+NamedMaterial "leftWall"
+Shape "trianglemesh"
+    "point3 P" [ -1.010000 0.000000 0.990000 -0.990000 -0.000000 -1.040000 -1.020000 1.990000 -1.040000 -1.020000 1.990000 0.990000 ]
+    "normal N" [ 1 0 0  1 0 0  1 0 0  1 0 0 ]
+    "integer indices" [ 0 1 2 0 2 3 ]
+
+# Light Source Geometry (with Emission)
+AttributeBegin
+    AreaLightSource "diffuse"
+        "rgb L" [ 18.387 13.9873 6.75357 ]
+    NamedMaterial "light"
+    Shape "trianglemesh"
+        "point3 P" [ -0.240000 1.980000 0.160000 -0.240000 1.980000 -0.220000 0.230000 1.980000 -0.220000 0.230000 1.980000 0.160000 ]
+        "normal N" [ 0 -1 0  0 -1 0  0 -1 0  0 -1 0 ]
+        "integer indices" [ 0 1 2 0 2 3 ]
+AttributeEnd
+
+WorldEnd

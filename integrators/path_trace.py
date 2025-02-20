@@ -34,7 +34,7 @@ def path_trace(ray, primitives, bvh, lights, light_sampler, sample_lights=1, sam
 
         # Check if we've reached the maximum recursion depth
         if depth > 4:
-            r_r = isect.nearest_object.material.diffuse.max()
+            r_r = isect.nearest_object.material.color.max()
             if ti.random() >= r_r:
                 break
             beta = beta/r_r
@@ -49,6 +49,7 @@ def path_trace(ray, primitives, bvh, lights, light_sampler, sample_lights=1, sam
 
         # direct lighting contribution
         if sample_lights:
+            # print("gonna sample")
             s_l = light_sampler.sample(ti.random())
             sampled_li = lights[s_l.light_idx]
             u_light = vec2(ti.random(), ti.random())
@@ -56,9 +57,11 @@ def path_trace(ray, primitives, bvh, lights, light_sampler, sample_lights=1, sam
             ls = sampled_li.sample_Li(isect.intersected_point, u_light, l_shape)
 
             if not is_black(ls.L) and ls.pdf > 0:
+                # print("sampling light 001")
                 wi = ls.wi
                 f = bsdf.f(wo, wi) * ti.abs(dot(wi, isect.normal))
                 if not is_black(f) and unoccluded(isect.intersected_point, isect.normal, ls.intr_p, primitives, bvh, 1e-4):
+                    # print("sampling light")
                     L += beta * (f * ls.L / ls.pdf) / s_l.pdf
 
         # BSDF sampling

@@ -117,7 +117,7 @@ class TrowbridgeReitzDistribution:
 
     @ti.func
     def roughness_to_alpha(self, roughness):
-        return sqrt(roughness)
+        return max(0.0001, roughness * roughness)
 
     @ti.func
     def regularize(self):
@@ -701,17 +701,21 @@ class BSDF:
         self.type = 1
 
     @ti.func
-    def add_dielectric(self, eta, color, roughness):
+    def add_dielectric(self, eta, color, uroughness, vroughness):
         self.dielectric.eta = eta
         self.dielectric.color = color
-        self.dielectric.init_tr_distribution(roughness)
+        alpha_x = self.dielectric.mf_distrib.roughness_to_alpha(uroughness)
+        alpha_y = self.dielectric.mf_distrib.roughness_to_alpha(vroughness)
+        self.dielectric.mf_distrib.initialize(alpha_x, alpha_y)
         self.type = 2
 
     @ti.func
-    def add_conductor(self, eta, k, roughness):
+    def add_conductor(self, eta, k, uroughness, vroughness):
         self.conductor.eta = eta
         self.conductor.k = k
-        self.conductor.init_tr_distribution(roughness)
+        alpha_x = self.conductor.mf_distrib.roughness_to_alpha(uroughness)
+        alpha_y = self.conductor.mf_distrib.roughness_to_alpha(vroughness)
+        self.conductor.mf_distrib.initialize(alpha_x, alpha_y)
         self.type = 3
 
     @ti.func

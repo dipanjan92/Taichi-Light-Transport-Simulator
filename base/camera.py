@@ -1,5 +1,5 @@
 import taichi as ti
-from taichi.math import vec3, normalize, dot, cross, radians, tan, sqrt, pi, cos, sin, vec2
+from taichi.math import vec3, normalize, dot, cross, radians, tan, sqrt, pi, cos, sin, vec2, length
 from base.frame import Frame, frame_from_z
 from primitives.ray import Ray
 
