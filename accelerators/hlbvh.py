@@ -8,9 +8,7 @@ from primitives.aabb import AABB, union, union_p, BVHPrimitive
 from accelerators.bvh import BVHNode
 from utils.constants import INF
 
-# ---------------------------------------------------------------------
-# Data classes for HLBVH
-# ---------------------------------------------------------------------
+
 @ti.dataclass
 class MortonPrimitive:
     prim_idx: ti.i32
@@ -22,9 +20,7 @@ class LBVHTreelet:
     n_primitives: ti.i32
     build_nodes_start: ti.i32  # index into BVHNode array
 
-# ---------------------------------------------------------------------
-# Global Fields
-# ---------------------------------------------------------------------
+
 MAX_PRIMS = 1_000_000
 
 morton_prims      = MortonPrimitive.field(shape=(MAX_PRIMS,))
@@ -65,10 +61,7 @@ build_upper_sah_minp     = ti.Vector.field(3, dtype=ti.f32, shape=MAX_PRIMS)
 build_upper_sah_maxp     = ti.Vector.field(3, dtype=ti.f32, shape=MAX_PRIMS)
 build_upper_sah_centroid = ti.Vector.field(3, dtype=ti.f32, shape=MAX_PRIMS)
 
-# ---------------------------------------------------------------------
-# expand_bits_10: cast large hex constants to ti.u32
-# Modified to avoid multiplication overflow by doing multiplications in 64-bit.
-# ---------------------------------------------------------------------
+
 @ti.func
 def expand_bits_10(v: ti.u32) -> ti.u32:
     v64 = ti.u64(v)
@@ -88,9 +81,7 @@ def encode_morton3(x: ti.f32, y: ti.f32, z: ti.f32) -> ti.u32:
     iz = expand_bits_10(ti.u32(zz))
     return (ix << 2) | (iy << 1) | iz
 
-# ---------------------------------------------------------------------
-# 6-bit Radix Sort
-# ---------------------------------------------------------------------
+
 @ti.func
 def morton_radix_sort(n: ti.i32):
     bits_per_pass = 6
@@ -131,11 +122,7 @@ def find_interval(n_prims: ti.i32, start_idx: ti.i32, mask: ti.u32) -> ti.i32:
         i += 1
     return i - 1
 
-# ---------------------------------------------------------------------
-# Cycle check utility.
-# If a child pointer would create a cycle (i.e. point to the current node or its parent),
-# force the current node to become a leaf.
-# ---------------------------------------------------------------------
+
 @ti.func
 def check_and_fix_cycle(
     cur_node_idx: ti.i32,
@@ -165,11 +152,7 @@ def check_and_fix_cycle(
         nodes[cur_node_idx].init_leaf(offset_here, s_count, b)
     return cyc
 
-# ---------------------------------------------------------------------
-# emit_lbvhtreelet: Fallback to leaf if no valid split or cycle detected.
-# (Also note that if a valid split is not produced, we force the node to become a leaf,
-#  rather than later leaving a missing child pointer.)
-# ---------------------------------------------------------------------
+
 @ti.func
 def emit_lbvhtreelet(
     start_idx: ti.i32,
@@ -296,12 +279,7 @@ def emit_lbvhtreelet(
 
     return root_idx
 
-# ---------------------------------------------------------------------
-# build_upper_sah: merges LBVH treelets with iterative SAH.
-# Fallbacks to equal-partition if the SAH split produces no progress.
-# Modified so that if a valid split is not produced, the node is not created as
-# an interior node with a missing child but instead the only subtree is passed through.
-# ---------------------------------------------------------------------
+
 @ti.func
 def build_upper_sah(
     nodes: ti.template(),
@@ -554,11 +532,7 @@ def build_upper_sah(
                 res = local_root_of_build
     return res
 
-# ---------------------------------------------------------------------
-# build_hlbvh - top-level kernel.
-# This function receives the original geometry array ("primitives")
-# and outputs a re-ordered geometry array ("ordered_prims").
-# ---------------------------------------------------------------------
+
 @ti.kernel
 def build_hlbvh(
     primitives: ti.template(),           # original geometry

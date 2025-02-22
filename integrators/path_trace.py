@@ -34,7 +34,7 @@ def path_trace(ray, primitives, bvh, lights, light_sampler, sample_lights=1, sam
 
         # Check if we've reached the maximum recursion depth
         if depth > 4:
-            r_r = isect.nearest_object.material.color.max()
+            r_r = isect.nearest_object.material.reflectance.max()
             if ti.random() >= r_r:
                 break
             beta = beta/r_r

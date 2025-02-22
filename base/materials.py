@@ -7,10 +7,11 @@ from base.bsdf import BSDF
 @ti.dataclass
 class Material:
     material_type: ti.i32
-    color: vec3
+    reflectance: vec3
+    transmittance: vec3
     uroughness: ti.f32   # Roughness along the "u" (tangent) direction.
     vroughness: ti.f32   # Roughness along the "v" (bitangent) direction.
-    eta: ti.f32
+    eta: vec3
     k: vec3
     emission: vec3
 
