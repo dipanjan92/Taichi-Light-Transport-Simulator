@@ -11,6 +11,7 @@ from utils.constants import INF
 
 @ti.func
 def trace_mis(ray, primitives, bvh, lights, light_sampler, sample_lights=1, sample_bsdf=1, max_depth=3):
+
     L = vec3(0.0)
     beta = vec3(1.0)  # Path throughput
     depth = 0  # Depth of the recursion
@@ -32,6 +33,7 @@ def trace_mis(ray, primitives, bvh, lights, light_sampler, sample_lights=1, samp
         # Check if emissive
         Le = vec3(0.0)
         Le += isect.Le(-ray.direction)
+
         if not is_black(Le):
             if depth == 0 or specular_bounce:
                 L += beta * Le
@@ -45,10 +47,13 @@ def trace_mis(ray, primitives, bvh, lights, light_sampler, sample_lights=1, samp
                     L += beta * w_l * Le
 
         # Get BSDF
-        bsdf = isect.get_bsdf()
+        bsdf = isect.nearest_object.bsdf
+        bsdf.init_frame(isect.normal, isect.dpdu)
+        # print(bsdf.frame.z)
 
         if bsdf.flags() == BXDF_NONE:
             specular_bounce = True
+            ray = spawn_ray(isect.intersected_point, isect.normal, ray.direction)
             continue
 
         # Regularize the BSDF if necessary
@@ -126,7 +131,7 @@ def sample_Ld(ray, primitives, bvh, isect, bsdf, light_sampler, lights):
 
     if not is_black(ls.L) and ls.pdf > 0:
         wi = ls.wi
-        f = bsdf.f(-ray.direction, wi) * ti.abs(dot(wi, isect.normal))
+        f = bsdf.f(-ray.direction, wi, 0) * ti.abs(dot(wi, isect.normal))
         if not is_black(f) and unoccluded(ctx_p, isect.normal, ls.intr_p, primitives, bvh, 1e-4):
             p_l = s_l.pdf * ls.pdf
 

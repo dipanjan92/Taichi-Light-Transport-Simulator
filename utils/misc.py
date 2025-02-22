@@ -166,12 +166,12 @@ def refract(wi, n, eta):
 
     # Compute sin²θᵢ using Snell's law
     sin2_theta_i = max(0.0, 1 - cos_theta_i ** 2)
-    sin2_theta_t = sin2_theta_i * eta ** 2
+    sin2_theta_t = sin2_theta_i / eta ** 2
 
     # Handle total internal reflection case
     if sin2_theta_t < 1:
         cos_theta_t = ti.sqrt(1 - sin2_theta_t)
-        wt = -wi * eta + (cos_theta_i * eta - cos_theta_t) * n
+        wt = -wi * eta + (cos_theta_i / eta - cos_theta_t) * n
         refracted = 1
         etap = eta
     else:

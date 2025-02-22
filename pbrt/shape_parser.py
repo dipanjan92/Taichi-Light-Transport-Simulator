@@ -157,36 +157,67 @@ def create_triangle_primitives(shape_data, material, bsdf, is_light, light_idx):
     return primitives_list
 
 
-def create_sphere_primitive(shape_data, material, bsdf, is_light, light_idx):
+def create_sphere_primitive(shape_data, material, bsdf, is_light, light_idx, global_transform):
     """
-    Parse a sphere shape and return a Primitive.
+    Parse a sphere shape and return a Primitive, properly handling transformations.
     """
-    radius = shape_data.get("radius", 1.0)
+    # Get base radius
+    radius = shape_data["properties"].get("radius", [1.0])[0]
+
+    # Start with center at the origin
     center = vec3(0.0, 0.0, 0.0)
-    T = shape_data.get("transform")
-    if T is not None:
-        # For a sphere, use the translation components (indices 12, 13, 14) as the center.
-        center = vec3(T[12], T[13], T[14])
-    sph = Sphere(center=center, radius=radius)
+
+    # Get transformation matrix
+    local_transform = shape_data.get("transform", IDENTITY_4x4)
+
+    # Combine global and local transforms
+    T = multiply_matrix4(global_transform, local_transform)
+
+    # Apply full transformation to center
+    center = vec3(
+        T[0] * 0.0 + T[4] * 0.0 + T[8] * 0.0 + T[12],
+        T[1] * 0.0 + T[5] * 0.0 + T[9] * 0.0 + T[13],
+        T[2] * 0.0 + T[6] * 0.0 + T[10] * 0.0 + T[14]
+    )
+
+    # Compute scale factor from transformation matrix
+    scale_x = vec3(T[0], T[1], T[2]).norm()
+    scale_y = vec3(T[4], T[5], T[6]).norm()
+    scale_z = vec3(T[8], T[9], T[10]).norm()
+
+    # Adjust radius based on maximum scale factor
+    radius *= max(scale_x, scale_y, scale_z)
+
+    # Create sphere primitive
+    sphere = Sphere(center=center, radius=radius)
+
+    # Handle light indexing
+    l_idx = light_idx[0] if is_light else -1
     if is_light:
-        l_idx = light_idx[0]
         light_idx[0] += 1
-    else:
-        l_idx = -1
-    prim = Primitive(
+
+    # Create and return primitive
+    return Primitive(
         shape_type=SPHERE_TYPE,
-        triangle=Triangle(vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0),
-                          vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0)),
-        sphere=sph,
+        triangle=Triangle(
+            vertex_1=vec3(0, 0, 0),
+            vertex_2=vec3(0, 0, 0),
+            vertex_3=vec3(0, 0, 0),
+            centroid=vec3(0, 0, 0),
+            normal=vec3(0, 0, 0),
+            edge_1=vec3(0, 0, 0),
+            edge_2=vec3(0, 0, 0)
+        ),
+        sphere=sphere,
         material=material,
         bsdf=bsdf,
         is_light=is_light,
         light_idx=l_idx
     )
-    return prim
 
 
-def parse_shapes(shapes_list, materials_list, primitives):
+
+def parse_shapes(shapes_list, materials_list, primitives, global_transform):
     is_light = 0
     light_count = [0]
     global_index = 0  # A running counter for primitives
@@ -217,7 +248,7 @@ def parse_shapes(shapes_list, materials_list, primitives):
                 # print(mat_name, material.reflectance, primitives[global_index].material.reflectance)
                 global_index += 1
         elif shape_type == "sphere":
-            prim = create_sphere_primitive(shape, material, bsdf, is_light, light_count)
+            prim = create_sphere_primitive(shape, material, bsdf, is_light, light_count, global_transform)
             primitives[global_index] = prim
             # print(mat_name, material.reflectance, primitives[global_index].material.reflectance)
             global_index += 1
